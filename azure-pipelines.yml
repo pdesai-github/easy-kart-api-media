@@ -1,0 +1,68 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  dockerRegistryServiceConnection: 'docker-service-connection'
+  imageRepository: 'pdesaidocker/easy-kart-api-media'
+  containerRegistry: 'pdesaidocker'
+  tag: '$(Build.BuildId)'
+
+stages:
+- stage: Build
+  displayName: Build
+  jobs:
+    - job: BuildAndPush
+      displayName: Build and Push Docker Image
+      steps:
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'restore'
+          projects: 'EasyKart.Api.Media/EasyKart.Api.Media.csproj'
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'build'
+          projects: 'EasyKart.Api.Media/EasyKart.Api.Media.csproj'
+          arguments: '--configuration Release'
+      - task: Docker@2
+        displayName: Build and push Docker image
+        inputs:
+          command: 'buildAndPush'
+          repository: $(imageRepository)
+          dockerfile: 'EasyKart.Api.Media/Dockerfile'
+          buildContext: '.'
+          tags: $(tag)
+          containerRegistry: $(dockerRegistryServiceConnection)
+
+- stage: Deploy
+  displayName: Deploy to AKS
+  dependsOn: Build
+  jobs:
+  - job: DeployToAKS
+    displayName: Deploy to AKS
+    steps:
+    - script: |
+        echo "Replacing {{imageTag}} in deployment.yaml with $(tag)"
+        sed -i 's/{{imageTag}}/$(tag)/g' EasyKart.Api.Media/deployment.yaml
+      displayName: Replace tag in deployment.yaml
+    - task: Kubernetes@1
+      displayName: Apply deployment.yaml
+      inputs:
+        kubernetesServiceEndpoint: 'aks-service-conn'
+        namespace: 'easy-kart'
+        command: 'apply'
+        arguments: '-f EasyKart.Api.Media/deployment.yaml'
+    - task: Kubernetes@1
+      displayName: Apply service.yaml
+      inputs:
+        kubernetesServiceEndpoint: 'aks-service-conn'
+        namespace: 'easy-kart'
+        command: 'apply'
+        arguments: '-f EasyKart.Api.Media/service.yaml'
