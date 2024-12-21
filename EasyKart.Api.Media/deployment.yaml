@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: easy-kart-media
+  namespace: easy-kart
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: easy-kart-media #This should be same label
+  template:
+    metadata:
+      labels:
+        app: easy-kart-media #This should be same label
+    spec:
+      containers:
+      - name: easy-kart-media
+        image: pdesaidocker/easy-kart-api-media:{{imageTag}}
+        ports:
+        - containerPort: 8080 #port defined in image dockerfile
+        env:
+        - name: StorageConnectionString
+          valueFrom:
+            configMapKeyRef:
+              name: easy-kart-media-config-map # ConfigMap name
+              key: StorageConnectionString         # Key in the ConfigMap
+        - name: ContainerName
+          valueFrom:
+            configMapKeyRef:
+              name: easy-kart-media-config-map
+              key: ContainerName      

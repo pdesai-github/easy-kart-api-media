@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: easy-kart-media-config-map
+  namespace: easy-kart
+data:
+  StorageConnectionString: ""
+  ContainerName: ""

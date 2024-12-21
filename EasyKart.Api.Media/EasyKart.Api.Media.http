@@ -1,0 +1,6 @@
+@EasyKart.Api.Media_HostAddress = http://localhost:5182
+
+GET {{EasyKart.Api.Media_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
