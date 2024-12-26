@@ -11,7 +11,7 @@ namespace EasyKart.Api.Media
 
             // Add services to the container.
             builder.Services.AddScoped<IImageService, ImageService>();
-            string allowedOrigins = builder.Configuration["AllowedOrigins"];
+            var allowedOrigins = builder.Configuration.GetSection("CorsSettings:AllowedOrigins").Get<string[]>();
 
             builder.Services.AddCors(options =>
             {
