@@ -21,11 +21,6 @@ spec:
         env:
         - name: StorageConnectionString
           valueFrom:
-            configMapKeyRef:
-              name: easy-kart-media-config-map # ConfigMap name
-              key: StorageConnectionString         # Key in the ConfigMap
-        - name: ContainerName
-          valueFrom:
-            configMapKeyRef:
-              name: easy-kart-media-config-map
-              key: ContainerName      
+            secretKeyRef:
+              name: easy-kart-secret  
+              key: storageauthkey
