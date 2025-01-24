@@ -59,10 +59,3 @@ stages:
         namespace: 'easy-kart'
         command: 'apply'
         arguments: '-f EasyKart.Api.Media/deployment.yaml'
-    - task: Kubernetes@1
-      displayName: Apply service.yaml
-      inputs:
-        kubernetesServiceEndpoint: 'az-k8s-easy-kart'
-        namespace: 'easy-kart'
-        command: 'apply'
-        arguments: '-f EasyKart.Api.Media/service.yaml'
